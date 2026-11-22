@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "seed:maintainer": "node scripts/seed-maintainer.mjs"
   },
   "dependencies": {
     "@mastra/core": "^1.85.0",

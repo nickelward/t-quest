@@ -30,6 +30,16 @@ The login and signup pages use the integrated Next.js auth routes:
 - New accounts are stored in the `users` table with bcrypt password hashes
 - The quest page requires a valid session; use the Log out button to end it
 
+### Maintainer test account
+
+Create a maintainer account as a regular database user; it uses the same password verification and login flow as any other account. Set `APP_ENV=development` and fill in the `MAINTAINER_*` values in your ignored `.env.local` with a unique email, username, names, and a strong password of at least 12 characters. Then run:
+
+```bash
+npm run seed:maintainer
+```
+
+For staging, use a separate isolated staging database and set `APP_ENV=staging`, `MAINTAINER_SEED_ENABLED=true`, and `ISOLATED_STAGING_DB=true` along with the account values. A production `NODE_ENV` is accepted only with those explicit staging settings. The script creates the account once; it will not change the password of an existing account.
+
 ## Tiger Data setup
 1. Create a free service at Tiger Data and copy the connection string into `DATABASE_URL`
 2. `npm run seed` creates the `places` table and loads `data/places.json`

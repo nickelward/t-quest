@@ -34,13 +34,14 @@ router.post("/register", async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await pool.query(
       `
       SELECT id
       FROM users
       WHERE email = $1
       `,
-      [email.trim()]
+      [normalizedEmail]
     );
 
     if (existingUser.rows.length > 0) {
@@ -81,7 +82,7 @@ router.post("/register", async (req, res) => {
         first_name.trim(),
         last_name.trim(),
         username.trim(),
-        email.trim(),
+        normalizedEmail,
         hashedPassword
       ]
     );
@@ -121,13 +122,14 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
     const result = await pool.query(
       `
       SELECT id, password_hash
       FROM users
       WHERE email = $1
       `,
-      [email.trim()]
+      [normalizedEmail]
     );
 
     if (result.rows.length === 0) {

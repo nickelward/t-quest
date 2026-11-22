@@ -114,7 +114,7 @@ test("register rejects missing fields and duplicate email addresses", async () =
       first_name: "Another",
       last_name: "User",
       username: "another-user",
-      email: "test@example.com",
+      email: "TEST@EXAMPLE.COM",
       password: "another-password"
     })
   );
@@ -127,7 +127,7 @@ test("login issues a token only for valid credentials", async () => {
   const success = await request(
     "/auth/login",
     jsonPost({
-      email: "test@example.com",
+      email: "TEST@EXAMPLE.COM",
       password: "correct-horse"
     })
   );
