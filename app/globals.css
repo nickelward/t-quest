@@ -181,6 +181,8 @@ a.btn2 { text-decoration: none; color: inherit; display: inline-block; }
 .auth-form input { width: 100%; min-height: 46px; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
 .auth-form input:focus { outline: 3px solid #ffcc0080; outline-offset: 1px; }
 .auth-submit { margin-top: 10px; }
+.auth-submit:disabled { opacity: .65; cursor: wait; }
+.auth-error { margin: 14px 0 0; padding: 10px 12px; border: 1.5px solid #a12b20; border-radius: 9px; background: #fdebe8; color: #7d2118; font-size: 13px; text-align: center; }
 .auth-switch { margin: 20px 0 0; text-align: center; font-size: 14px; }
 .auth-switch a { color: var(--ink); font-weight: 700; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .auth-notice { margin: 18px 0 0; padding: 10px 12px; border-radius: 9px; background: #f3ecdd; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }

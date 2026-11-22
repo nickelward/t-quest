@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 type AuthPageProps = {
@@ -10,11 +11,41 @@ type AuthPageProps = {
 
 export default function AuthPage({ mode }: AuthPageProps) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const isLogin = mode === "login";
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push("/quest");
+    setLoading(true);
+    setError("");
+    const form = new FormData(event.currentTarget);
+    const body = {
+      first_name: String(form.get("first_name") || ""),
+      last_name: String(form.get("last_name") || ""),
+      username: String(form.get("username") || ""),
+      email: String(form.get("email") || ""),
+      password: String(form.get("password") || ""),
+    };
+
+    try {
+      const res = await fetch(isLogin ? "/api/auth/login" : "/api/auth/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({ error: "Authentication failed" }));
+      if (!res.ok) {
+        setError(data.error || "Authentication failed");
+        return;
+      }
+      router.push("/quest");
+      router.refresh();
+    } catch {
+      setError("Could not reach the authentication service.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -47,6 +78,16 @@ export default function AuthPage({ mode }: AuthPageProps) {
           </p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <>
+                <label htmlFor="first_name">First name</label>
+                <input id="first_name" name="first_name" autoComplete="given-name" required />
+                <label htmlFor="last_name">Last name</label>
+                <input id="last_name" name="last_name" autoComplete="family-name" required />
+                <label htmlFor="username">Username</label>
+                <input id="username" name="username" autoComplete="username" required />
+              </>
+            )}
             <label htmlFor="email">Email</label>
             <input id="email" name="email" type="email" autoComplete="email" required />
             <label htmlFor="password">Password</label>
@@ -58,19 +99,17 @@ export default function AuthPage({ mode }: AuthPageProps) {
               minLength={8}
               required
             />
-            <button className="go auth-submit" type="submit">
-              {isLogin ? "Sign in" : "Sign up"} <span aria-hidden="true">→</span>
+            <button className="go auth-submit" type="submit" disabled={loading}>
+              {loading ? "Please wait..." : isLogin ? "Sign in" : "Sign up"} <span aria-hidden="true">→</span>
             </button>
           </form>
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <p className="auth-switch">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <Link href={isLogin ? "/signup" : "/login"}>
               {isLogin ? "Register here" : "Sign in here"}
             </Link>
-          </p>
-          <p className="auth-notice">
-            Authentication isn&apos;t connected yet. Submitting will take you to the quest builder.
           </p>
         </section>
       </main>

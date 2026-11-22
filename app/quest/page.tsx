@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { STATIONS, lineColor } from "@/lib/stations";
 import type { Quest } from "@/lib/quest";
 
@@ -14,6 +15,9 @@ const VIBES = [
 const fmtHours = (h: number) => (h % 1 ? `${h} hrs` : `${h} hr${h === 1 ? "" : "s"}`);
 
 export default function QuestPage() {
+  const router = useRouter();
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
   const [budget, setBudget] = useState(25);
   const [groupSize, setGroupSize] = useState(4);
   const [hours, setHours] = useState(3);
@@ -29,6 +33,28 @@ export default function QuestPage() {
   useEffect(() => {
     try { setBadges(JSON.parse(localStorage.getItem("tq-badges") || "[]")); } catch {}
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (!res.ok) throw new Error("unauthorized");
+        if (active) setAuthenticated(true);
+      })
+      .catch(() => {
+        if (active) router.replace("/login");
+      })
+      .finally(() => {
+        if (active) setAuthLoading(false);
+      });
+    return () => { active = false; };
+  }, [router]);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+    router.refresh();
+  }
 
   async function go() {
     setLoading(true);
@@ -59,6 +85,19 @@ export default function QuestPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allStamped]);
 
+  if (authLoading) {
+    return (
+      <>
+        <div className="strip">
+          <span style={{ background: "var(--green)" }} /><span style={{ background: "var(--red)" }} />
+          <span style={{ background: "var(--orange)" }} /><span style={{ background: "var(--blue)" }} />
+        </div>
+        <main className="wrap"><div className="empty"><p>Checking your T-Quest account...</p></div></main>
+      </>
+    );
+  }
+  if (!authenticated) return null;
+
   return (
     <>
       <div className="strip">
@@ -77,6 +116,7 @@ export default function QuestPage() {
           {badges.length > 0 && (
             <div className="badges">{badges.slice(-4).map((b) => <span key={b} className="badge">{b}</span>)}</div>
           )}
+          <button className="btn2" onClick={logout}>Log out</button>
         </header>
 
         <div className="grid">

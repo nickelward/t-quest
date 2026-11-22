@@ -17,8 +17,18 @@ Built at BostonHacks 2026 for the **Bos(tons) of Eats and Streets** track.
 ```bash
 npm install
 cp .env.example .env.local   # add your keys
+npm run seed                 # creates the users and places tables
 npm run dev                  # http://localhost:3000
 ```
+
+## Authentication
+
+The login and signup pages use the integrated Next.js auth routes:
+
+- `DATABASE_URL` connects to the Postgres/Tiger Data database
+- `JWT_SECRET` signs and verifies the two-hour session token
+- New accounts are stored in the `users` table with bcrypt password hashes
+- The quest page requires a valid session; use the Log out button to end it
 
 ## Tiger Data setup
 1. Create a free service at Tiger Data and copy the connection string into `DATABASE_URL`
